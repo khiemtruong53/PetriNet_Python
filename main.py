@@ -93,7 +93,7 @@ def main():
         reachable_explicit = net.get_reachable_markings()
         time_explicit = time.time() - start_explicit
         count_explicit = len(reachable_explicit)
-        print(f"✅ Explicit: {count_explicit} markings in {time_explicit:.10f}s")
+        print(f"✅ Explicit: {count_explicit} markings in {time_explicit:.0f} µs")
 
         # In ra toàn bộ marking
         print("\n📋 Reachable markings in firing order (BFS):")
@@ -106,12 +106,12 @@ def main():
         # Symbolic BDD
         print("\n🧠 Symbolic BDD: Computing reachable markings...")
         Reach_bdd, count_bdd, time_bdd, bdd_manager = symbolic_reachability_bdd(net)
-        print(f"✅ BDD: {count_bdd} markings in {time_bdd:.10f}s")
+        print(f"✅ BDD: {count_bdd} markings in {time_bdd:.0f} µs")
 
         # So sánh
         print(f"\n📊 Performance Comparison:")
-        print(f"  Explicit: {count_explicit} states, {time_explicit:.20f} seconds")
-        print(f"  BDD:      {count_bdd} states, {time_bdd:.20f} seconds")
+        print(f"  Explicit: {count_explicit} states, {time_explicit:.0f} µs")
+        print(f"  BDD:      {count_bdd} states, {time_bdd:.0f} µs")
         if count_explicit == count_bdd:
             print("  ✅ Counts match!")
         else:
