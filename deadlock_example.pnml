@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="deadlock_net" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name><text>Simple Deadlock Example</text></name>
+    
+    <page id="page1">
+      
+      <!-- Places -->
+      <place id="P1">
+        <name><text>P1</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+      
+      <place id="P2">
+        <name><text>P2</text></name>
+      </place>
+      
+      <place id="P3">
+        <name><text>P3</text></name>
+      </place>
+      
+      <!-- Transitions -->
+      <transition id="T1">
+        <name><text>T1</text></name>
+      </transition>
+      
+      <transition id="T2">
+        <name><text>T2</text></name>
+      </transition>
+      
+      <!-- Arcs -->
+      <!-- P1 → T1 → P2 -->
+      <arc id="a1" source="P1" target="T1"/>
+      <arc id="a2" source="T1" target="P2"/>
+      
+      <!-- T2 requires P2 AND P3, but P3 has no token -->
+      <arc id="a3" source="P2" target="T2"/>
+      <arc id="a4" source="P3" target="T2"/>
+      
+    </page>
+  </net>
+</pnml>
