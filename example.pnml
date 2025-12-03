@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="clean_net" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name><text>Clean Rewritten Petri Net</text></name>
+
+    <page id="page1">
+
+      <!-- ===================== -->
+      <!-- Places -->
+      <!-- ===================== -->
+
+      <place id="P1">
+        <name><text>P1</text></name>
+      </place>
+
+      <place id="P2">
+        <name><text>P2</text></name>
+      </place>
+
+      <place id="P3">
+        <name><text>P3</text></name>
+      </place>
+
+      <place id="P4">
+        <name><text>P4</text></name>
+      </place>
+
+      <place id="P5">
+        <name><text>P5</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+
+      <place id="P6">
+        <name><text>P6</text></name>
+      </place>
+
+      <!-- ===================== -->
+      <!-- Transitions -->
+      <!-- ===================== -->
+
+      <transition id="T1">
+        <name><text>T1</text></name>
+      </transition>
+
+      <transition id="T2">
+        <name><text>T2</text></name>
+      </transition>
+
+      <transition id="T3">
+        <name><text>T3</text></name>
+      </transition>
+
+      <transition id="T4">
+        <name><text>T4</text></name>
+      </transition>
+
+      <transition id="T5">
+        <name><text>T5</text></name>
+      </transition>
+
+      <!-- ===================== -->
+      <!-- Arcs (Mapping identical to your PNML) -->
+      <!-- ===================== -->
+
+      <!-- T1 outputs P1, P2 -->
+      <arc id="T1_P1" source="T1" target="P1"/>
+      <arc id="T1_P2" source="T1" target="P2"/>
+
+      <!-- P1 → T2, T5 -->
+      <arc id="P1_T2" source="P1" target="T2"/>
+      <arc id="P1_T5" source="P1" target="T5"/>
+
+      <!-- T2 → P3 -->
+      <arc id="T2_P3" source="T2" target="P3"/>
+
+      <!-- P3 → T4 -->
+      <arc id="P3_T4" source="P3" target="T4"/>
+
+      <!-- P2 → T3, T5 -->
+      <arc id="P2_T3" source="P2" target="T3"/>
+      <arc id="P2_T5" source="P2" target="T5"/>
+
+      <!-- T3 → P4 -->
+      <arc id="T3_P4" source="T3" target="P4"/>
+
+      <!-- P4 → T4 -->
+      <arc id="P4_T4" source="P4" target="T4"/>
+
+      <!-- T5 → P3, P4 -->
+      <arc id="T5_P3" source="T5" target="P3"/>
+      <arc id="T5_P4" source="T5" target="P4"/>
+
+      <!-- P5 → T1 -->
+      <arc id="P5_T1" source="P5" target="T1"/>
+
+      <!-- T4 → P6 -->
+      <arc id="T4_P6" source="T4" target="P6"/>
+
+    </page>
+  </net>
+</pnml>
