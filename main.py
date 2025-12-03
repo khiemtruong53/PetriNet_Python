@@ -69,10 +69,7 @@ def draw_reachability_graph(petri_net, output_file="reachability_graph.png"):
 
 
 def format_marking(m):
-    """Format a marking (frozenset) for display."""
-    if not m:
-        return "∅"
-    return "{" + ", ".join(sorted(m)) + "}"
+    return "∅" if not m else "{" + ", ".join(sorted(m)) + "}"
 
 
 def main():
@@ -88,34 +85,32 @@ def main():
         draw_petri_net(net, "petri_net.png")
 
         # Explicit BFS
-        print("\n🔍 Explicit BFS: Computing reachable markings...")
-        start_explicit = time.time()
+        t0 = time.perf_counter()
         reachable_explicit = net.get_reachable_markings()
-        time_explicit = time.time() - start_explicit
+        t1 = time.perf_counter()
         count_explicit = len(reachable_explicit)
-        print(f"✅ Explicit: {count_explicit} markings in {time_explicit:.0f} µs")
+        time_explicit_us = (t1 - t0) * 1_000_000
 
-        # In ra toàn bộ marking
+        print(f"\n🔍 Explicit BFS: {count_explicit} markings in {time_explicit_us:.0f} µs")
         print("\n📋 Reachable markings in firing order (BFS):")
         for i, m in enumerate(reachable_explicit, 1):
             print(f"  {i:2d}: {format_marking(m)}")
 
-        # Vẽ đồ thị reachability (sau khi có marking)
         draw_reachability_graph(net, "reachability_graph.png")
 
         # Symbolic BDD
-        print("\n🧠 Symbolic BDD: Computing reachable markings...")
-        Reach_bdd, count_bdd, time_bdd, bdd_manager = symbolic_reachability_bdd(net)
-        print(f"✅ BDD: {count_bdd} markings in {time_bdd:.0f} µs")
+        t2 = time.perf_counter()
+        Reach_bdd, count_bdd, time_bdd_sec, _ = symbolic_reachability_bdd(net)
+        t3 = time.perf_counter()
+        time_bdd_us = (t3 - t2) * 1_000_000
 
-        # So sánh
+        print(f"\n🧠 Symbolic BDD: {count_bdd} markings in {time_bdd_us:.0f} µs")
+
+        # Comparison
         print(f"\n📊 Performance Comparison:")
-        print(f"  Explicit: {count_explicit} states, {time_explicit:.0f} µs")
-        print(f"  BDD:      {count_bdd} states, {time_bdd:.0f} µs")
-        if count_explicit == count_bdd:
-            print("  ✅ Counts match!")
-        else:
-            print("  ❌ MISMATCH in counts!")
+        print(f"  Explicit: {count_explicit:>2} states, {time_explicit_us:>8.0f} µs")
+        print(f"  BDD:      {count_bdd:>2} states, {time_bdd_us:>8.0f} µs")
+        print("  ✅ Counts match!" if count_explicit == count_bdd else "  ❌ MISMATCH!")
 
     except Exception as e:
         print(f"❌ Error: {e}", file=sys.stderr)
