@@ -185,7 +185,7 @@ def run_all_tests():
 
         # ⭐⭐⭐ Test mạnh nhất: BDD >> BFS ⭐⭐⭐
         ("Parallel Chains n=5 (2^5 states)", build_parallel_chains(5)),
-        ("Parallel Chains n=10 (2^10 states)", build_parallel_chains(7))
+        ("Parallel Chains n=10 (2^10 states)", build_parallel_chains(8))
     ]
 
     for name, pn in tests:

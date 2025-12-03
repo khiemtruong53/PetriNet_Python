@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="dining_philosophers_5" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name>
+      <text>Dining Philosophers (5 Philosophers)</text>
+    </name>
+
+    <page id="page1">
+
+      <!-- Places: trạng thái và đũa -->
+      <!-- P_i_think: triết gia i đang nghĩ -->
+      <!-- P_i_eat: triết gia i đang ăn -->
+      <!-- C_i: đũa i (chia sẻ giữa triết gia i và i+1) -->
+
+      <!-- Triết gia 0 -->
+      <place id="P0_think"><name><text>P0_think</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="P0_eat"><name><text>P0_eat</text></name></place>
+      <!-- Triết gia 1 -->
+      <place id="P1_think"><name><text>P1_think</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="P1_eat"><name><text>P1_eat</text></name></place>
+      <!-- Triết gia 2 -->
+      <place id="P2_think"><name><text>P2_think</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="P2_eat"><name><text>P2_eat</text></name></place>
+      <!-- Triết gia 3 -->
+      <place id="P3_think"><name><text>P3_think</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="P3_eat"><name><text>P3_eat</text></name></place>
+      <!-- Triết gia 4 -->
+      <place id="P4_think"><name><text>P4_think</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="P4_eat"><name><text>P4_eat</text></name></place>
+
+      <!-- Đũa (chopsticks) -->
+      <place id="C0"><name><text>C0</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="C1"><name><text>C1</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="C2"><name><text>C2</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="C3"><name><text>C3</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="C4"><name><text>C4</text></name><initialMarking><text>1</text></initialMarking></place>
+
+      <!-- Transitions: chỉ cần take và release -->
+
+      <!-- Triết gia 0 -->
+      <transition id="T0_take"><name><text>T0_take</text></name></transition>
+      <transition id="T0_release"><name><text>T0_release</text></name></transition>
+
+      <!-- Triết gia 1 -->
+      <transition id="T1_take"><name><text>T1_take</text></name></transition>
+      <transition id="T1_release"><name><text>T1_release</text></name></transition>
+
+      <!-- Triết gia 2 -->
+      <transition id="T2_take"><name><text>T2_take</text></name></transition>
+      <transition id="T2_release"><name><text>T2_release</text></name></transition>
+
+      <!-- Triết gia 3 -->
+      <transition id="T3_take"><name><text>T3_take</text></name></transition>
+      <transition id="T3_release"><name><text>T3_release</text></name></transition>
+
+      <!-- Triết gia 4 -->
+      <transition id="T4_take"><name><text>T4_take</text></name></transition>
+      <transition id="T4_release"><name><text>T4_release</text></name></transition>
+
+      <!-- Arcs cho triết gia 0 -->
+      <arc source="P0_think" target="T0_take"/>
+      <arc source="C0" target="T0_take"/>
+      <arc source="C4" target="T0_take"/>
+      <arc source="T0_take" target="P0_eat"/>
+
+      <arc source="P0_eat" target="T0_release"/>
+      <arc source="T0_release" target="P0_think"/>
+      <arc source="T0_release" target="C0"/>
+      <arc source="T0_release" target="C4"/>
+
+      <!-- Arcs cho triết gia 1 -->
+      <arc source="P1_think" target="T1_take"/>
+      <arc source="C1" target="T1_take"/>
+      <arc source="C0" target="T1_take"/>
+      <arc source="T1_take" target="P1_eat"/>
+
+      <arc source="P1_eat" target="T1_release"/>
+      <arc source="T1_release" target="P1_think"/>
+      <arc source="T1_release" target="C1"/>
+      <arc source="T1_release" target="C0"/>
+
+      <!-- Triết gia 2 -->
+      <arc source="P2_think" target="T2_take"/>
+      <arc source="C2" target="T2_take"/>
+      <arc source="C1" target="T2_take"/>
+      <arc source="T2_take" target="P2_eat"/>
+
+      <arc source="P2_eat" target="T2_release"/>
+      <arc source="T2_release" target="P2_think"/>
+      <arc source="T2_release" target="C2"/>
+      <arc source="T2_release" target="C1"/>
+
+      <!-- Triết gia 3 -->
+      <arc source="P3_think" target="T3_take"/>
+      <arc source="C3" target="T3_take"/>
+      <arc source="C2" target="T3_take"/>
+      <arc source="T3_take" target="P3_eat"/>
+
+      <arc source="P3_eat" target="T3_release"/>
+      <arc source="T3_release" target="P3_think"/>
+      <arc source="T3_release" target="C3"/>
+      <arc source="T3_release" target="C2"/>
+
+      <!-- Triết gia 4 -->
+      <arc source="P4_think" target="T4_take"/>
+      <arc source="C4" target="T4_take"/>
+      <arc source="C3" target="T4_take"/>
+      <arc source="T4_take" target="P4_eat"/>
+
+      <arc source="P4_eat" target="T4_release"/>
+      <arc source="T4_release" target="P4_think"/>
+      <arc source="T4_release" target="C4"/>
+      <arc source="T4_release" target="C3"/>
+
+    </page>
+  </net>
+</pnml>

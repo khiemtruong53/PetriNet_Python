@@ -40,7 +40,6 @@ def symbolic_reachability_bdd(petri_net: PetriNet) -> Tuple[Any, int, float, BDD
     R = bdd.add_expr(" & ".join(init_terms)) if init_terms else bdd.true
 
     # Build global transition relation T(X, Y) = ∨_t T_t(X, Y)
-    # 🔥 FIX: Tích lũy dần thay vì nối chuỗi lớn
     T_global = bdd.false
 
     for t in petri_net.transitions:
@@ -53,39 +52,43 @@ def symbolic_reachability_bdd(petri_net: PetriNet) -> Tuple[Any, int, float, BDD
         else:
             guard = "True"
 
-        # Next-state constraints
+        # Next-state constraints — FIXED LOGIC
         next_constraints = []
         for p in places:
             i = place_to_idx[p]
+            x = x_vars[i]
             y = y_vars[i]
-            if p in pre:
-                next_constraints.append(f"~{y}")          # consumed → 0
-            elif p in post:
-                next_constraints.append(y)                # produced → 1
+            in_pre = p in pre
+            in_post = p in post
+
+            if in_pre and in_post:
+                # Net effect: token consumed and produced → unchanged
+                next_constraints.append(f"({x} <-> {y})")
+            elif in_pre:
+                # Only consumed → must be 0 in next state
+                next_constraints.append(f"~{y}")
+            elif in_post:
+                # Only produced → must be 1 in next state
+                next_constraints.append(y)
             else:
-                x = x_vars[i]
-                next_constraints.append(f"({x} <-> {y})") # unchanged
+                # Unchanged
+                next_constraints.append(f"({x} <-> {y})")
 
         body = " & ".join(next_constraints)
         T_t_expr = f"({guard}) & ({body})" if guard != "True" else body
         T_t = bdd.add_expr(T_t_expr)
         
-        # 🔥 Tích lũy: T_global = T_global OR T_t
+        # Accumulate: T_global = T_global OR T_t
         T_global = bdd.apply("or", T_global, T_t)
 
     # Fixpoint iteration: R = R ∪ Image(R)
     rename_map = {y_vars[i]: x_vars[i] for i in range(n)}
-    current_var_names = x_vars  # list of strings for existential quantification
+    current_var_names = x_vars  # for existential quantification
 
-    iteration = 0
     while True:
-        iteration += 1
-
         # Image = ∃X. (R ∧ T)
         image = bdd.apply("and", R, T_global)
         image = bdd.exist(current_var_names, image)
-
-        # Rename Y → X
         image = bdd.let(rename_map, image)
 
         # New = image \ R

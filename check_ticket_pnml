@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="figure_5_5" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name>
+      <text>Figure 5.5: A marked Petri net with one initial token</text>
+    </name>
+
+    <page id="page1">
+
+      <!-- Places -->
+      <place id="start"><name><text>start</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="c1"><name><text>c1</text></name></place>
+      <place id="c2"><name><text>c2</text></name></place>
+      <place id="c3"><name><text>c3</text></name></place>
+      <place id="c4"><name><text>c4</text></name></place>
+      <place id="c5"><name><text>c5</text></name></place>
+      <place id="end"><name><text>end</text></name></place>
+
+      <!-- Transitions -->
+      <transition id="a"><name><text>a</text></name><label><text>register request</text></label></transition>
+      <transition id="b"><name><text>b</text></name><label><text>examine thoroughly</text></label></transition>
+      <transition id="c"><name><text>c</text></name><label><text>examine casually</text></label></transition>
+      <transition id="d"><name><text>d</text></name><label><text>check ticket</text></label></transition>
+      <transition id="e"><name><text>e</text></name><label><text>decide</text></label></transition>
+      <transition id="f"><name><text>f</text></name><label><text>reinitiate request</text></label></transition>
+      <transition id="g"><name><text>g</text></name><label><text>pay compensation</text></label></transition>
+      <transition id="h"><name><text>h</text></name><label><text>reject request</text></label></transition>
+
+      <!-- Arcs -->
+
+      <!-- Start → a -->
+      <arc source="start" target="a"/>
+
+      <!-- a → AND-split → c1 and c2 -->
+      <arc source="a" target="c1"/>
+      <arc source="a" target="c2"/>
+
+      <!-- c1 → XOR-split → b or c -->
+      <arc source="c1" target="b"/>
+      <arc source="c1" target="c"/>
+
+      <!-- b → c3, c → c3 -->
+      <arc source="b" target="c3"/>
+      <arc source="c" target="c3"/>
+
+      <!-- c3 → e -->
+      <arc source="c3" target="e"/>
+
+      <!-- e → c5 -->
+      <arc source="e" target="c5"/>
+
+      <!-- c2 → d -->
+      <arc source="c2" target="d"/>
+
+      <!-- d → c4 -->
+      <arc source="d" target="c4"/>
+
+      <!-- c4 → f -->
+      <arc source="c4" target="f"/>
+
+      <!-- f → c2 (XOR-join back to c2) -->
+      <arc source="f" target="c2"/>
+
+      <!-- c5 → AND-join → wait for e and f -->
+      <!-- Already covered: e → c5, f → c2 → ... but we need f to reach c5 too? -->
+
+      <!-- ❗️Lưu ý: Trong hình, f có đường về c2, nhưng để vào c5, cần thêm arc từ f đến c5? -->
+      <!-- Tuy nhiên, theo hình vẽ: c5 nhận từ e và f → nên ta thêm arc f → c5 -->
+
+      <arc source="f" target="c5"/>
+
+      <!-- c5 → XOR-split → g or h -->
+      <arc source="c5" target="g"/>
+      <arc source="c5" target="h"/>
+
+      <!-- g → end, h → end -->
+      <arc source="g" target="end"/>
+      <arc source="h" target="end"/>
+
+    </page>
+  </net>
+</pnml>
