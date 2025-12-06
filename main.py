@@ -1,10 +1,11 @@
-# main.py - Updated with Task 4 Integration
+# main.py - Updated with Task 4 & 5 Integration
 
 import sys
 import time
 from pnml_parser import parse_pnml
 from bdd import symbolic_reachability_bdd
 from deadlock_detection import detect_deadlock, format_marking, is_deadlock_explicit
+from optimization import optimize_reachable_markings_bruteforce, optimize_reachable_markings_ilp
 import matplotlib.pyplot as plt
 import networkx as nx
 
@@ -99,7 +100,7 @@ def main():
     try:
         net = parse_pnml(sys.argv[1])
         print("="*70)
-        print("✅ PNML PARSING SUCCESSFUL")
+        print("PNML PARSING SUCCESSFUL")
         print("="*70)
         print(net)
 
@@ -107,7 +108,7 @@ def main():
         # TASK 2: Explicit Reachability (BFS)
         # ====================================
         print("\n" + "="*70)
-        print("📊 TASK 2: EXPLICIT REACHABILITY (BFS)")
+        print("TASK 2: EXPLICIT REACHABILITY (BFS)")
         print("="*70)
         
         t0 = time.perf_counter()
@@ -116,22 +117,22 @@ def main():
         count_explicit = len(reachable_explicit)
         time_explicit_ms = (t1 - t0) * 1000
 
-        print(f"🔍 Found: {count_explicit} reachable markings")
-        print(f"⏱️  Time: {time_explicit_ms:.3f} ms")
+        print(f"Found: {count_explicit} reachable markings")
+        print(f"Time: {time_explicit_ms:.3f} ms")
         
-        print("\n📋 Reachable markings (in firing order):")
+        print("\nReachable markings (in firing order):")
         for i, m in enumerate(reachable_explicit, 1):
             print(f"  {i:2d}: {format_marking(m)}")
 
         # Draw Petri net
         draw_petri_net(net, "petri_net.png")
-        print("\n💾 Saved: petri_net.png")
+        print("\nSaved: petri_net.png")
 
         # ====================================
         # TASK 3: Symbolic Reachability (BDD)
         # ====================================
         print("\n" + "="*70)
-        print("🧠 TASK 3: SYMBOLIC REACHABILITY (BDD)")
+        print("TASK 3: SYMBOLIC REACHABILITY (BDD)")
         print("="*70)
         
         t2 = time.perf_counter()
@@ -139,12 +140,12 @@ def main():
         t3 = time.perf_counter()
         time_bdd_ms = (t3 - t2) * 1000
 
-        print(f"🔍 Found: {count_bdd} reachable markings")
-        print(f"⏱️  Time: {time_bdd_ms:.3f} ms")
+        print(f"Found: {count_bdd} reachable markings")
+        print(f"Time: {time_bdd_ms:.3f} ms")
 
         # Comparison
         print("\n" + "="*70)
-        print("📈 PERFORMANCE COMPARISON (Tasks 2 vs 3)")
+        print("PERFORMANCE COMPARISON (Tasks 2 vs 3)")
         print("="*70)
         print(f"{'Method':<15} {'States':>8} {'Time (ms)':>12} {'Speedup':>10}")
         print("-"*70)
@@ -153,15 +154,15 @@ def main():
         print("-"*70)
         
         if count_explicit == count_bdd:
-            print("✅ Verification: Counts match!")
+            print("Verification: Counts match!")
         else:
-            print("❌ WARNING: Count mismatch!")
+            print("WARNING: Count mismatch!")
 
         # ====================================
         # TASK 4: Deadlock Detection
         # ====================================
         print("\n" + "="*70)
-        print("🔒 TASK 4: DEADLOCK DETECTION (ILP + BDD)")
+        print("TASK 4: DEADLOCK DETECTION (ILP + BDD)")
         print("="*70)
         
         # Try both methods
@@ -173,7 +174,7 @@ def main():
             results[method] = (deadlock, elapsed)
             
             method_name = method.upper().replace("_", " ")
-            print(f"\n📊 Method: {method_name}")
+            print(f"\nMethod: {method_name}")
             print(f"   Result: {format_marking(deadlock)}")
             print(f"   Time: {elapsed*1000:.3f} ms")
         
@@ -182,46 +183,114 @@ def main():
         
         print("\n" + "="*70)
         if deadlock_marking:
-            print("❌ DEADLOCK DETECTED!")
+            print("DEADLOCK DETECTED!")
             print("="*70)
-            print(f"🎯 Deadlock marking: {format_marking(deadlock_marking)}")
+            print(f"Deadlock marking: {format_marking(deadlock_marking)}")
             
             # Verify it's reachable
             if deadlock_marking in set(reachable_explicit):
-                print("✅ Verified: Marking is reachable from initial state")
+                print("Verified: Marking is reachable from initial state")
             else:
-                print("⚠️  WARNING: Marking not found in explicit reachable set!")
+                print("WARNING: Marking not found in explicit reachable set!")
             
             # Verify no transitions enabled
             enabled = [t for t in net.transitions if net.is_enabled(t, deadlock_marking)]
             if not enabled:
-                print("✅ Verified: No transitions enabled (true deadlock)")
+                print("Verified: No transitions enabled (true deadlock)")
             else:
-                print(f"⚠️  WARNING: Transitions enabled: {enabled}")
+                print(f"WARNING: Transitions enabled: {enabled}")
             
             # Draw reachability graph with deadlock highlighted
             draw_reachability_graph(net, deadlock_marking, "reachability_graph.png")
-            print("\n💾 Saved: reachability_graph.png (deadlock in RED)")
+            print("\nSaved: reachability_graph.png (deadlock in RED)")
             
         else:
-            print("✅ NO DEADLOCK FOUND")
+            print("NO DEADLOCK FOUND")
             print("="*70)
             print("System is deadlock-free (all reachable markings enable at least one transition)")
             
             # Draw reachability graph
             draw_reachability_graph(net, None, "reachability_graph.png")
-            print("\n💾 Saved: reachability_graph.png")
+            print("\nSaved: reachability_graph.png")
+
+        # ====================================
+        # TASK 5: Optimization over Reachable Markings
+        # ====================================
+        print("\n" + "="*70)
+        print("TASK 5: OPTIMIZATION OVER REACHABLE MARKINGS")
+        print("="*70)
+        
+        places_list = sorted(net.places)
+        print(f"\nPlaces: {places_list}")
+        
+        # Define weights (can be customized)
+        # Option 1: Sequential weights (1, 2, 3, ...)
+        weights = {p: i for i, p in enumerate(places_list, 1)}
+        
+        # Option 2: Custom weights (uncomment to use)
+        # weights = {'P1': 10, 'P2': 5, 'P3': 3, 'P4': 2, 'P5': 1, 'P6': 1}
+        
+        print(f"Weights: {weights}")
+        
+        # Method 1: Brute Force
+        print(f"\n{'='*70}")
+        print("Method 1: BRUTE FORCE")
+        print(f"{'='*70}")
+        
+        t4 = time.perf_counter()
+        optimal_marking_bf, optimal_value_bf, time_bf = optimize_reachable_markings_bruteforce(net, weights)
+        t5 = time.perf_counter()
+        time_bf_ms = (t5 - t4) * 1000
+        
+        if optimal_marking_bf:
+            print(f"Optimal marking: {format_marking(optimal_marking_bf)}")
+            print(f"Optimal value: {optimal_value_bf}")
+            print(f"Computation time: {time_bf_ms:.3f} ms")
+        else:
+            print("No reachable marking found")
+        
+        # Method 2: ILP
+        print(f"\n{'='*70}")
+        print("Method 2: INTEGER LINEAR PROGRAMMING (ILP)")
+        print(f"{'='*70}")
+        
+        t6 = time.perf_counter()
+        optimal_marking_ilp, optimal_value_ilp, time_ilp = optimize_reachable_markings_ilp(net, weights)
+        t7 = time.perf_counter()
+        time_ilp_ms = (t7 - t6) * 1000
+        
+        if optimal_marking_ilp:
+            print(f"Optimal marking: {format_marking(optimal_marking_ilp)}")
+            print(f"Optimal value: {optimal_value_ilp}")
+            print(f"Computation time: {time_ilp_ms:.3f} ms")
+        else:
+            print("No reachable marking found")
+        
+        # Comparison
+        print(f"\n{'='*70}")
+        print("PERFORMANCE COMPARISON (Task 5 Methods)")
+        print(f"{'='*70}")
+        print(f"{'Method':<20} {'Value':>10} {'Time (ms)':>12} {'Speedup':>10}")
+        print("-"*70)
+        print(f"{'Brute Force':<20} {optimal_value_bf:>10} {time_bf_ms:>12.3f} {'1.00x':>10}")
+        print(f"{'ILP':<20} {optimal_value_ilp:>10} {time_ilp_ms:>12.3f} {time_bf_ms/time_ilp_ms if time_ilp_ms > 0 else float('inf'):>10.2f}")
+        print("-"*70)
+        
+        if optimal_value_bf == optimal_value_ilp:
+            print("Verification: Both methods found the same optimal value!")
+        else:
+            print("WARNING: Different results!")
 
         # ====================================
         # SUMMARY
         # ====================================
         print("\n" + "="*70)
-        print("📋 SUMMARY")
+        print("SUMMARY")
         print("="*70)
         print(f"Petri Net: {net.name}")
         print(f"  Places: {len(net.places)}")
         print(f"  Transitions: {len(net.transitions)}")
-        print(f"  Initial marking: {format_marking(net.initial_marking)}")
+        print(f"  Initial marking: {format_marking(frozenset(net.initial_marking))}")
         print(f"\nReachability:")
         print(f"  Total states: {count_explicit}")
         print(f"  Explicit time: {time_explicit_ms:.3f} ms")
@@ -232,13 +301,17 @@ def main():
             print(f"  Marking: {format_marking(deadlock_marking)}")
         else:
             print(f"  Status: NONE (deadlock-free)")
+        print(f"\nOptimization:")
+        print(f"  Optimal marking: {format_marking(optimal_marking_bf)}")
+        print(f"  Optimal value: {optimal_value_bf}")
+        print(f"  Best method: {'Brute Force' if time_bf_ms < time_ilp_ms else 'ILP'} ({min(time_bf_ms, time_ilp_ms):.3f} ms)")
         
         print("\n" + "="*70)
-        print("✅ ALL TASKS COMPLETED SUCCESSFULLY")
+        print("ALL TASKS COMPLETED SUCCESSFULLY")
         print("="*70)
 
     except Exception as e:
-        print(f"\n❌ Error: {e}", file=sys.stderr)
+        print(f"\nError: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
         sys.exit(1)
